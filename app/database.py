@@ -1,9 +1,11 @@
 """SQLite engine and session setup."""
 
 import os
+import sqlite3
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 load_dotenv()
@@ -15,6 +17,13 @@ _connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite"
 
 engine = create_engine(DATABASE_URL, connect_args=_connect_args)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+
+@event.listens_for(Engine, "connect")
+def _enable_sqlite_foreign_keys(dbapi_connection, _record) -> None:
+    """SQLite ignores FK constraints unless told otherwise, per connection."""
+    if isinstance(dbapi_connection, sqlite3.Connection):
+        dbapi_connection.execute("PRAGMA foreign_keys=ON")
 
 
 class Base(DeclarativeBase):

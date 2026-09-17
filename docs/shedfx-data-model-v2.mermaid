@@ -1,0 +1,103 @@
+erDiagram
+ 
+    SETLIST {
+        string id PK
+        string name
+        string gig_date
+        string venue
+        string notes
+    }
+ 
+    SETLIST_SONG {
+        string id PK
+        string setlist_id FK
+        string song_id FK
+        int position
+    }
+ 
+    SONG {
+        string id PK
+        string title
+        string artist
+        string key
+        int bpm
+        string lyrics_url
+        string tab_url
+        string notes
+    }
+ 
+    SONG_FOOTSWITCH {
+        string id PK
+        string song_id FK
+        string effects_flow_id FK
+        int switch_slot
+    }
+ 
+    EFFECTS_FLOW {
+        string id PK
+        string name
+        string description
+        float input_gain
+        float output_gain
+    }
+ 
+    LED_DISPLAY {
+        string id PK
+        string effects_flow_id FK
+        string label
+        string colour
+        int brightness
+    }
+ 
+    FOOTSWITCH_MAP {
+        string id PK
+        string effects_flow_id FK
+        int switch_number
+        string action
+        string target_effect_id FK
+    }
+ 
+    EFFECT {
+        string id PK
+        string effects_flow_id FK
+        string effect_model_id FK
+        int chain_position
+        boolean enabled
+    }
+ 
+    EFFECT_PARAMS {
+        string id PK
+        string effect_id FK
+        string param_name
+        float value
+        float min
+        float max
+    }
+ 
+    EFFECT_MODEL {
+        string id PK
+        string model_library_id FK
+        string name
+        string type
+        string tone3000_id
+        string file_path
+    }
+ 
+    MODEL_LIBRARY {
+        string id PK
+        string source
+        string category
+        string description
+        string download_url
+    }
+ 
+    SETLIST ||--o{ SETLIST_SONG : "contains"
+    SONG ||--o{ SETLIST_SONG : "appears in"
+    SONG ||--o{ SONG_FOOTSWITCH : "assigns up to 4"
+    EFFECTS_FLOW ||--o{ SONG_FOOTSWITCH : "mapped to switch slot"
+    EFFECTS_FLOW ||--|| LED_DISPLAY : "displayed on"
+    EFFECTS_FLOW ||--o{ FOOTSWITCH_MAP : "defines actions for"
+    EFFECTS_FLOW ||--o{ EFFECT : "chains"
+    EFFECT ||--o{ EFFECT_PARAMS : "has"
+    EFFECT ||--|| EFFECT_MODEL : "instance of"
+    EFFECT_MODEL ||--|| MODEL_LIBRARY : "sourced from"
