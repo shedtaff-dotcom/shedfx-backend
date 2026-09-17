@@ -2,11 +2,16 @@
 
 from fastapi import FastAPI
 
+from app.routers import all_routers
+
 app = FastAPI(
     title="ShedFX Backend",
     description="Control API for the ShedFX NAM floor unit. Runs on the Pi.",
     version="0.1.0",
 )
+
+for router in all_routers:
+    app.include_router(router)
 
 
 @app.get("/status", tags=["status"])
